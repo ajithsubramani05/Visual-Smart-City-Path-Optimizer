@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Route with Pins and Distance</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6weEz28oqcKlc7FOgA9zKxJRf3uAHpU8"></script>
+    <script>
+      function initMap() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 13,
+          center: { lat: 12.9716, lng: 77.5946 }, // Bangalore
+        });
+
+        const directionsService = new google.maps.DirectionsService();
+        const directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+
+        const origin = "Bangalore, India";
+        const destination = "Indiranagar, Bangalore, India";
+
+        const request = {
+          origin: origin,
+          destination: destination,
+          travelMode: "DRIVING",
+          drivingOptions: {
+            departureTime: new Date(),
+            trafficModel: "bestguess",
+          },
+        };
+
+        directionsService.route(request, (result, status) => {
+          if (status === "OK") {
+            directionsRenderer.setDirections(result);
+
+            const leg = result.routes[0].legs[0];
+            new google.maps.Marker({
+              position: leg.start_location,
+              map: map,
+              label: "A",
+              title: "Start: " + origin,
+            });
+
+            new google.maps.Marker({
+              position: leg.end_location,
+              map: map,
+              label: "B",
+              title: "End: " + destination,
+            });
+
+            const info = `Distance: ${leg.distance.text}, Duration: ${leg.duration_in_traffic.text}`;
+            document.getElementById("output").innerText = info;
+          } else {
+            alert("Directions request failed: " + status);
+          }
+        });
+      }
+    </script>
+    <style>
+      body, html {
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 90vh;
+        width: 100%;
+      }
+      #output {
+        padding: 10px;
+        font-size: 16px;
+        font-family: sans-serif;
+        background: #f0f0f0;
+        border-top: 2px solid #ccc;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body onload="initMap()">
+    <div id="map"></div>
+    <div id="output">Loading route info...</div>
+  </body>
+</html>
